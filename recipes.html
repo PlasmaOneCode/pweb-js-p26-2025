@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe Collection</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="recipes-body">
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="navbar-left">
+      <h2>🍽️ Recipe Collection</h2>
+    </div>
+    <div class="navbar-right">
+      <span id="userName"></span>
+      <button id="logoutBtn" class="logout-btn">Logout</button>
+    </div>
+  </nav>
+
+  <!-- SEARCH DAN FILTER -->
+  <section class="search-filter">
+    <input type="text" id="searchInput" placeholder="Cari resep, cuisine, atau bahan..." />
+    <select id="cuisineFilter">
+      <option value="">Semua Cuisine</option>
+    </select>
+  </section>
+
+  <!-- DAFTAR RESEP -->
+  <main id="recipesContainer" class="recipes-container">
+    <!-- Card resep akan dimasukkan lewat JS -->
+  </main>
+
+  <div class="show-more-container">
+    <button id="showMoreBtn" class="show-more-btn">Tampilkan Lebih Banyak</button>
+  </div>
+
+  <div id="recipeModal" class="modal hidden">
+    <div class="modal-content">
+      <span id="closeModal" class="close">&times;</span>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <script src="js/recipes.js" defer></script>
+</body>
+</html>
