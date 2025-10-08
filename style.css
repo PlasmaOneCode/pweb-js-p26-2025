@@ -133,7 +133,12 @@ button:active {
 
 .navbar-right {
   display: flex;
-  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.navbar-right #userName {
+  white-space: nowrap; 
 }
 
 
