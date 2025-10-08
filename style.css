@@ -164,9 +164,11 @@ button:active {
 /* Recipes card*/
 .recipes-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(4, 1fr); /* default 4 card per baris */
   gap: 20px;
-  padding: 20px;
+  padding: 20px 40px;
+  justify-items: center;
+  align-items: start;
 }
 
 .recipe-card {
@@ -176,6 +178,28 @@ button:active {
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   transition: transform 0.2s, box-shadow 0.3s;
   padding: 20px;
+  width: 100%;
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .recipes-container {
+    grid-template-columns: repeat(3, 1fr); /* 3 card per baris */
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .recipes-container {
+    grid-template-columns: repeat(2, 1fr); /* 2 card per baris */
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  .recipes-container {
+    grid-template-columns: 1fr; /* 1 card per baris */
+  }
 }
 
 .recipe-card:hover {
@@ -318,4 +342,21 @@ button:active {
 /* Modal tersembunyi dahulu */
 .modal.hidden {
   display: none !important;
+}
+
+/* Ingredients tags */
+.ingredients-tags {
+  margin-top: 8px;
+}
+
+.ingredient-tag {
+  display: inline-block;
+  background-color: #fff4e6;
+  border: 1px solid #ff8800;
+  color: #ff8800;
+  border-radius: 12px;
+  padding: 4px 8px;
+  margin: 2px;
+  font-size: 12px;
+  font-weight: 500;
 }

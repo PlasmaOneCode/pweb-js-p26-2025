@@ -25,32 +25,31 @@ window.addEventListener('DOMContentLoaded', () => {
     loginBtn.disabled = true;
 
     try {
-      const res = await fetch('https://dummyjson.com/users');
-      if (!res.ok) throw new Error('Gagal mengambil data user.');
+      const res = await fetch('https://dummyjson.com/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+
+      if (!res.ok) throw new Error('Username atau password salah.');
       const data = await res.json();
 
-      const user = data.users.find(u => u.username.toLowerCase() === username.toLowerCase());
+      await new Promise(resolve => setTimeout(resolve, 700)); // animasi loading kecil
 
-      await new Promise(resolve => setTimeout(resolve, 700));
+      localStorage.setItem('firstName', data.firstName);
 
-      if (!user) {
-        throw new Error('Username tidak ditemukan.');
-      }
-
-      localStorage.setItem('firstName', user.firstName);
-
-      message.textContent = `Login berhasil! Selamat datang, ${user.firstName}.`;
+      message.textContent = `Login berhasil! Selamat datang, ${data.firstName}.`;
       message.style.color = 'green';
 
       setTimeout(() => {
         window.location.href = 'recipes.html';
       }, 1000);
+
     } catch (err) {
       console.error(err);
       message.textContent = err.message || 'Terjadi kesalahan saat login.';
       message.style.color = 'red';
     } finally {
-
       loading.classList.add('hidden');
       loginBtn.disabled = false;
     }
