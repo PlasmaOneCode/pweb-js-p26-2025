@@ -17,7 +17,8 @@ window.addEventListener('DOMContentLoaded', () => {
   const closeModal = document.getElementById('closeModal');
 
   let recipes = [];
-  let visibleCount = 6;
+  const cardsPerRow = 4; 
+  let visibleCount = cardsPerRow * 2; 
   let searchTimeout;
 
   userName.textContent = `Halo, ${user}!`;
@@ -72,12 +73,26 @@ window.addEventListener('DOMContentLoaded', () => {
         <p><strong>Rating:</strong> ⭐ ${recipe.rating}</p>
         <button class="view-btn" data-id="${recipe.id}">Lihat Resep Lengkap</button>
       `;
+            // Tambahkan tampilan ingredients sebagai tag kecil
+      const ingredientsContainer = document.createElement('div');
+      ingredientsContainer.classList.add('ingredients-tags');
+
+      // Batasi maksimal 3–4 ingredients supaya tidak terlalu panjang
+      recipe.ingredients.slice(0, 4).forEach(ing => {
+        const tag = document.createElement('span');
+        tag.classList.add('ingredient-tag');
+        tag.textContent = ing;
+        ingredientsContainer.appendChild(tag);
+      });
+
+      card.appendChild(ingredientsContainer);
+
       recipesContainer.appendChild(card);
     });
   }
 
   showMoreBtn.addEventListener('click', () => {
-    visibleCount += 6;
+    visibleCount += cardsPerRow * 2;
     renderRecipes(recipes.slice(0, visibleCount));
   });
 
