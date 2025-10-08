@@ -15,28 +15,42 @@ window.addEventListener('DOMContentLoaded', () => {
   const modal = document.getElementById('recipeModal');
   const modalContent = document.getElementById('modalContent');
   const closeModal = document.getElementById('closeModal');
+  const logoutModal = document.getElementById('logoutModal');
+  const confirmLogout = document.getElementById('confirmLogout');
+  const cancelLogout = document.getElementById('cancelLogout');
 
   let recipes = [];
-  const cardsPerRow = 4; 
-  let visibleCount = cardsPerRow * 2; 
+  let filteredRecipes = [];
+  const cardsPerRow = 4;
+  let visibleCount = cardsPerRow * 2;
   let searchTimeout;
 
   userName.textContent = `Halo, ${user}!`;
 
   logoutBtn.addEventListener('click', () => {
+    logoutModal.classList.remove('hidden');
+  });
+
+  confirmLogout.addEventListener('click', () => {
     localStorage.clear();
-    alert('Anda telah logout.');
+    logoutModal.classList.add('hidden');
     window.location.href = 'login.html';
   });
 
+  cancelLogout.addEventListener('click', () => {
+    logoutModal.classList.add('hidden');
+  });
+
+
   async function loadRecipes() {
-    recipesContainer.innerHTML = '<p class="loading">🔄 Memuat resep...</p>';
+    recipesContainer.innerHTML = '<p class="loading">Memuat resep...</p>';
 
     try {
       const res = await fetch('https://dummyjson.com/recipes');
       if (!res.ok) throw new Error('Gagal memuat data dari server');
       const data = await res.json();
       recipes = data.recipes;
+      filteredRecipes = recipes;
 
       const cuisines = [...new Set(recipes.map(r => r.cuisine))];
       cuisines.forEach(cuisine => {
@@ -46,10 +60,10 @@ window.addEventListener('DOMContentLoaded', () => {
         cuisineFilter.appendChild(option);
       });
 
-      renderRecipes(recipes.slice(0, visibleCount));
+      renderRecipes(filteredRecipes.slice(0, visibleCount));
     } catch (err) {
       console.error(err);
-      recipesContainer.innerHTML = `<p class="error">❌ ${err.message}</p>`;
+      recipesContainer.innerHTML = `<p class="error">${err.message}</p>`;
     }
   }
 
@@ -73,11 +87,11 @@ window.addEventListener('DOMContentLoaded', () => {
         <p><strong>Rating:</strong> ⭐ ${recipe.rating}</p>
         <button class="view-btn" data-id="${recipe.id}">Lihat Resep Lengkap</button>
       `;
-            // Tambahkan tampilan ingredients sebagai tag kecil
+
+      // Tambahkan tampilan ingredients sebagai tag kecil
       const ingredientsContainer = document.createElement('div');
       ingredientsContainer.classList.add('ingredients-tags');
-
-      // Batasi maksimal 3–4 ingredients supaya tidak terlalu panjang
+      // Tambahkan ingredient tags (maks 4)
       recipe.ingredients.slice(0, 4).forEach(ing => {
         const tag = document.createElement('span');
         tag.classList.add('ingredient-tag');
@@ -86,36 +100,46 @@ window.addEventListener('DOMContentLoaded', () => {
       });
 
       card.appendChild(ingredientsContainer);
-
       recipesContainer.appendChild(card);
     });
   }
 
-  showMoreBtn.addEventListener('click', () => {
-    visibleCount += cardsPerRow * 2;
-    renderRecipes(recipes.slice(0, visibleCount));
-  });
+  // Fungsi gabungan filter + search
+  function updateFilteredRecipes() {
+    const q = searchInput.value.toLowerCase();
+    const selectedCuisine = cuisineFilter.value;
+
+    filteredRecipes = recipes.filter(r => {
+      const matchSearch =
+        r.name.toLowerCase().includes(q) ||
+        r.cuisine.toLowerCase().includes(q) ||
+        r.ingredients.join(',').toLowerCase().includes(q) ||
+        r.tags.join(',').toLowerCase().includes(q);
+
+      const matchCuisine = selectedCuisine ? r.cuisine === selectedCuisine : true;
+
+      return matchSearch && matchCuisine;
+    });
+
+    renderRecipes(filteredRecipes.slice(0, visibleCount));
+  }
 
   searchInput.addEventListener('input', e => {
     clearTimeout(searchTimeout);
     searchTimeout = setTimeout(() => {
-      const q = e.target.value.toLowerCase();
-      const filtered = recipes.filter(r =>
-        r.name.toLowerCase().includes(q) ||
-        r.cuisine.toLowerCase().includes(q) ||
-        r.ingredients.join(',').toLowerCase().includes(q) ||
-        r.tags.join(',').toLowerCase().includes(q)
-      );
-      renderRecipes(filtered.slice(0, visibleCount));
+      visibleCount = cardsPerRow * 2;
+      updateFilteredRecipes();
     }, 300);
   });
 
-  cuisineFilter.addEventListener('change', e => {
-    const selected = e.target.value;
-    const filtered = selected
-      ? recipes.filter(r => r.cuisine === selected)
-      : recipes;
-    renderRecipes(filtered.slice(0, visibleCount));
+  cuisineFilter.addEventListener('change', () => {
+    visibleCount = cardsPerRow * 2;
+    updateFilteredRecipes();
+  });
+
+  showMoreBtn.addEventListener('click', () => {
+    visibleCount += cardsPerRow * 2;
+    renderRecipes(filteredRecipes.slice(0, visibleCount));
   });
 
   recipesContainer.addEventListener('click', e => {
@@ -142,10 +166,7 @@ window.addEventListener('DOMContentLoaded', () => {
     modal.classList.remove('hidden');
   }
 
-  closeModal.addEventListener('click', () => {
-    modal.classList.add('hidden');
-  });
-
+  closeModal.addEventListener('click', () => modal.classList.add('hidden'));
   modal.addEventListener('click', e => {
     if (e.target === modal) modal.classList.add('hidden');
   });
